@@ -1,0 +1,157 @@
+# Default values for servatrice.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: blastdan/servatrice
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+server:
+  name: My Cockatrice server
+  id: 1
+  host: any
+  port: 4747
+  numberPools: 1
+  websocketNumberPools: 1
+  websocketHost: any
+  websocketPort: 4748
+  statusUpdate: 15000
+  writeLog: 1
+  logFile: server.log
+  logFilters:
+  clientKeepAlive: 1
+  maxPlayerInactivityTime: 15
+  requireClientId: false
+  requiredFeatures: ""
+  officialWarnings: "Flamming,Spamming,Causing Drama,Abusive Language"
+  idleClientTimeout: 3600
+
+authentication:
+  method: sql
+  password:
+  regOnly: false
+
+users:
+  minNameLength: 6
+  maxNameLength: 12
+  allowLowerCase: true
+  allowUpperCase: true
+  allowNumerics: true
+  allowedPunctuation: "_.-"
+  allowPunctuationPrefix: false
+  disallowedWords: admin
+  disallowedRegExp: ""
+  minPasswordLength: 6
+
+registration:
+  enabled: false
+  requireEmail: true
+  requireEmailActivation: false
+  maxAccountsPerEmail: 1
+  emailProviderBlacklist:
+
+forgotPassword:
+  enable: false
+  tokenLife: 60
+  enableChallenge: false
+  subject: "Cockatrice forgot password token"
+  body: "Hi %username, sorry to hear you forgot your password on our Cockatrice server\r\nHere's the token to use to reset your account password:\r\n\r\n%token\r\n\r\nHappy gaming!"
+
+smtp:
+  enableInternalSmtpClient: true
+  connection: tcp
+  acceptAllCerts: false
+  host: localhost
+  port: 25
+  username: root@localhost
+  password: foobar
+  email: email=root@localhost
+  name: "Cockatrice server"
+  subject: "Cockatrice server account activation token"
+  body: "Hi %username, thank our for registering on our Cockatrice server\r\nHere's the activation token you need to supply for activating your account:\r\n\r\n%token\r\n\r\nHappy gaming!"
+
+database:
+  type: mysql
+
+rooms:
+  method: sql
+
+game:
+  maxGameInactivityTime: 120
+  storeReplays: true
+  allowCreateAsJudge: false
+
+security:
+  enableMaxUserLimit: false
+  maxUsersTotal: 500
+  maxUsersTcpL: 500
+  maxUsersWebSocket: 500
+  maxUsersPerAddress: 4
+  trustedSources: "127.0.0.1,::1"
+  messageCountingInterval: 10
+  maxMessageSizePerInterval: 1000
+  maxMessageCountPerInterval: 10
+  maxGamesPerUser: 5
+  commandCountingInterval: 10
+  maxCommandCountPerInterval: 20
+
+logging:
+  enableLogQuery: false
+  logUserMsgRoom: false
+  logUserMsgGame: false
+  logUserMsgChat: false
+  logUserMsgIsl: false
+
+audit:
+  enableAudit: true
+  enableRegistrationAudit: true
+  enableForgotPasswordAudit: true
+
+mysql:
+  mysqlUser: servatrice
+  mysqlDatabase: servatrice

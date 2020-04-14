@@ -1,0 +1,384 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: servatrice-servatrice.ini
+  labels:
+      app: {{ template "mysql.fullname" . }}
+      chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+      release: "{{ .Release.Name }}"
+      heritage: "{{ .Release.Service }}"
+data:
+  servatrice.ini: |-
+      ; Servatrice configuration file
+      ;
+      ; This is the main configuration file for Servatrice; while using a configuration is not mandatory,
+      ; you may want to customize some aspects of your servatrice instance, like its name, port or the way
+      ; users can authenticate to the server.
+      ;
+      ; Can be passed to servatrice with --config /path/to/servatrice.ini
+
+      [server]
+      ; This is the name that servatrice exposes to the users; the default value is pretty boring
+      name={{ .Values.server.name | quote}}
+
+      ; Multiple servatrice servers can run on the same host using the same database; each server instance
+      ; must have a different id; the default id is 1
+      id={{ .Values.server.id }}
+
+      ; The IP address servatrice will listen on for clients; defaults to "any" to listen on all the interfaces,
+      ; a specific IPv4/v6 addresses can be used, eg for localhost-only 127.0.0.1 for IPv4 or ::1 for IPv6.
+      host={{ .Values.server.host }}
+
+      ; The TCP port number servatrice will listen on for clients; default is 4747
+      port={{ .Values.server.port }}
+
+      ; Servatrice can scale up to serve big number of users using more than one parallel thread of execution;
+      ; If your server is hosting a lot of players and they frequently report of being unable to login or
+      ; long delays (lag), you may want to try increasing this value; default is 1.
+      ; Set to 0 to disable the tcp server.
+      number_pools={{ .Values.server.numberPools }}
+
+      ; Servatrice can listen for clients on websockets, too. Unfortunately it can't support more than one thread.
+      ; Set to 0 to disable the websocket server.
+      websocket_number_pools={{ .Values.server.websocketNumberPools }}
+
+      ; The IP address servatrice will listen on for websockets clients; defaults to "any"
+      websocket_host={{ .Values.server.websocketHost }}
+
+      ; The TCP port number servatrice will listen on for websockets clients; default is 4748
+      websocket_port={{ .Values.server.websocketPort }}
+
+      ; When database is enabled, servatrice writes the server status in the "update" database table; this
+      ; setting defines every how many milliseconds servatrice will update its status; default is 15000 (15 secs)
+      statusupdate={{ .Values.server.statusUpdate }}
+
+      ; Do you want servatrice to write important events and errors to a logfile? Default is 1 (yes).
+      writelog={{ .Values.server.writeLog }}
+
+      ; Choose a name for the log file, if enabled; you can specify an absolute path or a path relative to
+      ; the servatrice executable; the default file name is server.log (in the same path as servatrice)
+      ; Note: When running servatrice under windows you will need to use double backslashes between folder locations
+      ; [ex: C:\\Temp\\server.log ]
+      logfile=server.{{ .Values.server.logFile }}
+
+      ; You may want to log only certain messages in the logfile. The default log level is extremely verbose.
+      ; This setting should contain a comma-separated list of strings that will be selectively logged.
+      ; All other lines will be excluded from the log. Default is empty; example: "Registration,_Login,foobar"
+      logfilters={{ .Values.server.logFilters | quote }}
+
+      ; Set the time interval in seconds that servatrice will use to communicate with each connected client
+      ; to verify the client has not timed out. Defaults is 1 seconds
+      clientkeepalive={{ .Values.server.clientKeepAlive }}
+
+      ; Maximum time in seconds a player can stay inactive with there client not even responding to pings, before is
+      ; considered disconnected; default is 15
+      max_player_inactivity_time={{ .Values.server.maxPlayerInactivityTime }}
+
+      ; More modern clients generate client IDs based on specific client side information.  Enable this option to
+      ; require that clients report the client ID in order to log into the server.  Default is false
+      requireclientid={{ .Values.server.requireClientId }}
+
+      ; You can limit the types of clients that connect to the server by requiring different features be available
+      ; on the client.  This setting can contain a comma-seperated list of features.  if any of the features
+      ; listed in this line are not available on the client the client will be denied access to the server upon
+      ; attempting to log in.  Example: "client_id,client_ver,websocket"
+      requiredfeatures={{ .Values.server.requiredFeatures | quote }}
+
+      ; You can define custom warnings that users are sent when the moderation staff uses the right client warn user
+      ; menu option.  This list is comma seperated that each item will appear in the drop down list for staff members
+      ; to choose from.  Example: "Flaming,Foul Language"
+      officialwarnings={{ .Values.server.officialWarnings | quote }}
+
+      ; Maximum time in seconds a player can stay connected but idle.  Default is 3600 (0 = disabled)
+      ; Clients will be notified at the 90% time period of pending disconnection if they do not take action.
+      idleclienttimeout={{ .Values.server.idleClientTimeout }}
+
+      [authentication]
+
+      ; Servatrice can authenticate users connecting. It currently supports 3 different authentication methods:
+      ; * none: no authentication, accept every user;
+      ; * password: require users to specify a common password to log in;
+      ; * sql: authenticate users against the "users" table of the database;
+      ; Please note that only the "sql" method permits to have registered users and store their data on the server.
+      method={{ .Values.authentication.method }}
+
+      ; if the chosen authentication method is password, here you can define the password your users will use to log in
+      password={{ .Values.authentication.password | quote }}
+
+      ; Accept only registered users? default is false (accept unregistered users)
+      regonly={{ .Values.authentication.regOnly }}
+
+      [users]
+
+      ; The minimum length a username can be
+      minnamelength={{ .Values.users.minNameLength }}
+
+      ; The maximum length a username can be
+      maxnamelength={{ .Values.users.maxNameLength }}
+
+      ; If a username should be allowed to contain lowercase chars [a-z]
+      allowlowercase={{ .Values.users.allowLowerCase }}
+
+      ; If a username should be allowed to conatain uppercase chars [A-Z]
+      allowuppercase={{ .Values.users.allowUpperCase }}
+
+      ; If a username should be allowed to contain numbers [0-9]
+      allownumerics={{ .Values.users.allowNumerics }}
+
+      ; Define punctuation allowed in usernames
+      allowedpunctuation={{ .Values.users.allowedPunctuation }}
+
+      ; If a username can begin with punctuation defined in allowedpunctuation
+      allowpunctuationprefix={{ .Values.users.allowPunctuationPrefix }}
+
+      ; Disallow usernames containing these words. This list is comma seperated, e.g.
+      ; "admin,user,name"
+      disallowedwords={{ .Values.users.allowPunctuationPrefix | quote }}
+
+      ; Disallow usernames matching these regular expressions. This list is comma
+      ; separated, e.g. "\\w+\\d+,\\d{2}user", hence you cannot use commas in your
+      ; expressions. Backslashes must be escaped, so `\w+\d+` becomes `\\w+\\d+`.
+      ; WARNING: Complex expressions can be harmful to performance. Please make sure
+      ;          your expressions are considered well formed. See this page for info:
+      ;          http://www.regular-expressions.info/catastrophic.html
+      disallowedregexp={{ .Values.users.disallowedRegExp | quote }}
+
+      ; Define minimum password length
+      ; Default 6.
+      minpasswordlength={{ .Values.users.minPasswordLength }} 
+
+      [registration]
+
+      ; Servatrice can process registration requests to add new users on the fly.
+      ; Enable this feature? Default false.
+      enabled={{ .Values.registration.enabled }} 
+
+      ; Require users to provide an email address in order to register. Default true.
+      requireemail={{ .Values.registration.requireEmail }} 
+
+      ; Require email activation. Newly registered users will receive an activation token by email,
+      ; and will be required to input back this token on cockatrice at the first login to get their
+      ; account activated. Default true.
+      requireemailactivation={{ .Values.registration.requireEmailActivation }} 
+
+      ; Set this number to the maximum number of accounts any one user can use to create new accounts
+      ; using the same email address. 0 = Unlimited number of accounts (default).
+      maxaccountsperemail={{ .Values.registration.maxAccountsPerEmail }} 
+
+      ; You can prevent users from using certain mail domains for registration.  This setting contains a
+      ; comma-seperated list of email provider domains that you would like to prevent users from using
+      ; during registration. Comparison's are implicit, so placing an entry such as mail.com will also
+      ; prevent users from registering accounts with providers such as gmail.com and hotmail.com
+      ; Example: "10minutemail.com,gmail.com"
+      emailproviderblacklist={{ .Values.registration.emailProviderBlacklist | quote }} 
+
+      [forgotpassword]
+
+      ; Servatrice can process forgot password requests allowing users to reset their account
+      ; passwords in the event they forget it.  Should this feature be enabled? Default: false.
+      enable={{ .Values.forgotPassword.enable }} 
+
+      ; Forgot password request should not be allowed to stay valid forever.  This settings
+      ; informs servatrice how long a players forgot password reset token is valid for (in minutes).
+      ; Default: 60
+      tokenlife={{ .Values.forgotPassword.tokenLife }} 
+
+      ; Servatrice can challenge users that are making forgot password requests to answer
+      ; questions in regards to their account to help validate they are the true owner of the account.
+      ; Should this feature be enabled? Default: false
+      enablechallenge={{ .Values.forgotPassword.enableChallenge }} 
+
+      ; Email subject for the forgot password emails
+      subject={{ .Values.forgotPassword.subject | quote }} 
+
+      ; Forgot password email body. You can use these tags here: %username %token
+      ; They will be substituted with the actual values in the email
+      ;
+      body={{ .Values.forgotPassword.body | quote }} 
+
+      [smtp]
+
+      ; Enable the internal smtp client to send registration emails.  If you would like to
+      ; use some other method to send email activation tokens set this value to false. Otherwise
+      ; setting it to true (default) the server will send canned generated emails containing
+      ; activation tokens for you during update intervals. Setting this to false will require
+      ; you to either manually activate user accounts or manually send users the activation token
+      ; by whatever means.
+      enableinternalsmtpclient={{ .Values.smtp.enableInternalSmtpClient }}
+
+      ; Connectin type: currently supported method are "tcp" and "ssl"; tls is autodetected if available
+      connection={{ .Values.smtp.connection }}
+
+      ; Accept all certificates: in ssl mode, enable this if your server is using an invalid/self signed certificate
+      acceptallcerts={{ .Values.smtp.acceptAllCerts }};
+
+      ; Hostname or IP addres of the smtp server
+      host={{ .Values.smtp.host }}
+
+      ; Smtp port number of the smtp server. Usual values are 25 or 587 for tcp, 465 for ssl
+      port={{ .Values.smtp.port }}
+
+      ; Username: this typically matches the "from" email address
+      username={{ .Values.smtp.username }}
+
+      ; Password for the username
+      password={{ .Values.smtp.password }}
+
+      ; Sender email address: the "from" email address
+      email={{ .Values.smtp.email | quote}}
+
+      ; Sender email name
+      name={{ .Values.smtp.name | quote}}
+
+      ; Email subject
+      subject={{ .Values.smtp.subject  | quote}}
+
+      ; Email body. You can use these tags here: %username %token
+      ; They will be substituted with the actual values in the email
+      ;
+      body={{ .Values.smtp.body  | quote}}
+
+      [database]
+      ; Database type. Valid values are:
+      ; * none: no database;
+      ; * mysql: mysql or compatible database;
+      type={{ .Values.database.type }}
+
+      ; Prefix used in he database for table names; default is cockatrice
+      prefix={{ .Values.database.prefix }}
+
+      ; Database connection parameter: server hostname or IP
+      hostname={{ .Release.Name }}-mysql
+
+      ; Database connection parameter: database name
+      database={{ .Values.mysql.mysqlDatabase }}
+
+      ; Database connection parameter: database user
+      user={{ .Values.mysql.mysqlUser }}
+
+      ; Database connection parameter: database user's password
+      password={{ .Values.mysql.mysqlPassword }}
+
+      [rooms]
+
+      ; A servatrice server can expose to the users different "rooms" to chat and create games. Rooms can be defined
+      ; with two different methods:
+      ; config: rooms are defined in this configuration (see the following example)
+      ; sql: rooms are defined in the "rooms" table of the database
+      method={{ .Values.rooms.method }}
+
+      [game]
+
+      ; Maximum time in seconds all players in a game can stay inactive before the game is automatically closed;
+      ; default is 120
+      max_game_inactivity_time={{ .Values.game.maxGameInactivityTime }}
+
+      ; All actions during a game are recorded and stored in the database as a replay that all participants of
+      ; the game can go back to and review after the game is closed.  This can require a fairly large amount of
+      ; storage to save all the information.  Disable this option to prevent the storing of replay data in
+      ; the database.  Default value is true.
+      store_replays={{ .Values.game.storeReplays }}
+
+      ; Allow users to create a new game and join it as a judge. The host will be able to execute any action on
+      ; the cards of every player. This is needed in order to support some games (eg. Werewolf).
+      ; Default off to prevent abuse on servers that are mostly running other games.
+      allow_create_as_judge={{ .Values.game.allowCreateAsJudge }}
+
+      [security]
+      ; You may want to restrict the number of users that can connect to your server at any given time.
+      enable_max_user_limit={{ .Values.security.enableMaxUserLimit }}
+
+      ; Maximum number of users that can connect to the server, default is 500.
+      max_users_total={{ .Values.security.maxUsersTotal }}
+
+      ; Maximum number of users that can connect to the server using a tcp connection, default is 500.
+      max_users_tcp={{ .Values.security.maxUsersTcp }}
+
+      ; Maximum number of users that can connect to the server using a websocket connection, default is 500.
+      max_users_websocket={{ .Values.security.maxUsersWebSocket }}
+
+      ; Maximum number of users that can connect from the same IP address; useful to avoid bots, default is 4
+      max_users_per_address={{ .Values.security.maxUsersPerAddress }}
+
+      ; You may want to allow an unlimited number of users from a trusted source. This setting can contain a
+      ; comma-separed list of IP addresses which will allow an unlimited number of connections from each of the
+      ; IP addresses listed (ignoring the max_users_per_address). Default is "127.0.0.1,::1"; example: "192.73.233.244,81.4.100.74"
+      trusted_sources={{ .Values.security.trustedSources | quote }}
+
+      ; Servatrice can avoid users from flooding rooms with large number of messages in an interval of time.
+      ; This setting defines the length in seconds of the considered interval; default is 10
+      message_counting_interval={{ .Values.security.messageCountingInterval }}
+
+      ; Maximum size in characters of all messages in an interval before new messages gets dropped; default is 1000
+      max_message_size_per_interval={{ .Values.security.maxMessageSizePerInterval }}
+
+      ; Maximum number of messages in an interval before new messages gets dropped; default is 10
+      max_message_count_per_interval={{ .Values.security.maxMessageCountPerInterval }}
+
+      ; Maximum number of games a single user can create; default is 5
+      max_games_per_user={{ .Values.security.maxGamesPerUser }}
+
+      ; Servatrice can avoid users from flooding games with large number of game commands in an interval of time.
+      ; This setting defines the length in seconds of the considered interval; default is 10
+      command_counting_interval={{ .Values.security.commandCountingInterval }}
+
+      ; Maximum number of game commands in an interval before new commands gets dropped; default is 20
+      max_command_count_per_interval={{ .Values.security.maxCommandCountPerInterval }}
+
+      [logging]
+      ; Admin/Moderators can query the stored logs for information when looking up reports by various players. This
+      ; option can allow or disallow them from doing so.
+      ; !!NOTE!! Enabling this feature puts a very high CPU and DISK load on the server, enable with caution.
+      enablelogquery={{ .Values.logging.enableLogQuery }}
+
+      ; Servatrice can log user messages to the database table cockatrice_log.
+      ; These messages can come from different sources; each source can be enabled separately.
+
+      ; Log user messages inside chat rooms
+      log_user_msg_room={{ .Values.logging.logUserMsgRoom }}
+
+      ; Log user messages inside games
+      log_user_msg_game={{ .Values.logging.logUserMsgGame }}
+
+      ; Log user messages in private chats
+      log_user_msg_chat={{ .Values.logging.logUserMsgChat }}
+
+      ; Log user messages coming from other servers in the network
+      log_user_msg_isl={{ .Values.logging.logUserMsgIsl }}
+
+      [audit]
+
+      ; Servatrice can record certain actions being performed in the database for server operators to better understand
+      ; if some one may be abusing application functionality.  Enabling auditing will allow servatrice to record any
+      ; of the below enabled audit functionality to be recorded.
+      ; Default: true
+      enable_audit={{ .Values.audit.enableAudit }}
+
+      ; Servatrice can record when users attempt a new account registration.  Should we enable auditing for this action?
+      ; Default: true
+      enable_registration_audit={{ .Values.audit.enableRegistrationAudit }}
+
+      ; Servatrice can record when a users attempts to reset the account password.  Should we enable auditing for this action?
+      ; Default: true
+      enable_forgotpassword_audit={{ .Values.audit.enableForgotPasswordAudit }}
+
+
+      ; EXPERIMENTAL - NOT WORKING YET
+      ; The following settings are relative to the server network functionality, that is not yet complete.
+      ; Avoid enabling it unless you are willing to test it and help its development.
+
+      [servernetwork]
+
+      ; Servatrice servers can connect themselves and build a network. This settins enable the ability of servatrice
+      ; of waiting for other server's connections and connect to other servers. Other servers can be defined in the
+      ; "servers" table of the database. Default is 0 (disabled)
+      active=0
+
+      ; The TCP port number servatrice will listen on for other servers; default is 14747
+      ; port=14747
+
+      ; Server-to-server communication needs a valid certificate in PEM format. Enter its filename in this setting
+      ; ssl_cert=ssl_cert.pem
+
+      ; Filename of the private key for the server-to-server certificate
+      ; ssl_key=ssl_key.pem
