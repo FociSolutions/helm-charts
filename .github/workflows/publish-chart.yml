@@ -6,7 +6,7 @@ name: publish-chart
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [ master ] 
 
 jobs:
   helm-package:
