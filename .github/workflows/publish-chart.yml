@@ -23,8 +23,9 @@ jobs:
   chart-release:
     runs-on: ubuntu-latest
     name: chart release
+    needs: [helm-package]
     container: 
-      image: docker://quay.io/helmpack/chart-release
+      image: quay.io/helmpack/chart-release
       env:
         CR_OWNER: "FociSolutions"
         CR_GIT_REPO: "helm-charts"
@@ -47,6 +48,8 @@ jobs:
           path: ./index.yaml
   publish-index:
     runs-on: [ubuntu-latest]
+    name: publish index
+    needs: [chart-release]
     steps:
       - uses: actions/download-artifact@master
         with:
