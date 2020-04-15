@@ -9,26 +9,49 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  helm-package:
     runs-on: ubuntu-latest
     steps:
-      - uses: docker://quay.io/helmpack/chart-releaser
       - name: Checkout
         uses: actions/checkout@v2
       - name: helm package
         run: helm package ./charts/servatrice --destination .deploy
-      - name: chart releaser step
-        env:
-          CR_OWNER: "FociSolutions"
-          CR_GIT_REPO: "helm-charts"
-          CR_PACKAGE_PATH: ".deploy"
-          CR_TOKEN:  "${{ secrets.GITHUB_TOKEN }}"
-          CR_GIT_BASE_URL: "https://api.github.com/"
-          CR_GIT_UPLOAD_URL: "https://uploads.github.com/"  
-        run: |
-          cr upload
-          cr index -i ./cr-index/index.yaml
-          
+      - uses: actions/upload-artifact@master
+        with:
+          name: charts
+          path: .deploy
+  chart-release:
+    runs-on: ubuntu-latest
+    name: chart release
+    container: 
+      image: docker://quay.io/helmpack/chart-release
+      env:
+        CR_OWNER: "FociSolutions"
+        CR_GIT_REPO: "helm-charts"
+        CR_PACKAGE_PATH: ".deploy"
+        CR_TOKEN:  "${{ secrets.GITHUB_TOKEN }}"
+        CR_GIT_BASE_URL: "https://api.github.com/"
+        CR_GIT_UPLOAD_URL: "https://uploads.github.com/"        
+    steps:
+      - uses: actions/download-artifact@master
+        name: download charts
+        with:
+          name: charts
+          path: .deploy
+      - name: generate index
+        run: cr index -i ./index.yaml
+      - uses: actions/upload-artifact@master
+        name: upload index
+        with:
+          name: index
+          path: ./index.yaml
+  publish-index:
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: index
+          path: ./index.yaml
       - name: Publish generated content to GitHub Pages
         uses: tsunematsu21/actions-publish-gh-pages@v1.0.0
         with:
