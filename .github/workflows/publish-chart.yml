@@ -39,6 +39,8 @@ jobs:
         with:
           name: charts
           path: .deploy
+      - name: upload releases
+        run: cr upload -p .deploy
       - name: generate index
         run: cr index -i ./index.yaml -c https://focisolutions.github.io/helm-charts/
       - uses: actions/upload-artifact@master
