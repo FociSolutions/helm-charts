@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: helm package
-        run: helm  package charts/servatrice --destination .deploy
+        run: helm  package ./charts/servatrice --destination .deploy
         
       - uses: docker://quay.io/helmpack/chart-releaser
       - name: chart releaser step
