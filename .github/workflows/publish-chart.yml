@@ -25,7 +25,7 @@ jobs:
     name: chart release
     needs: [helm-package]
     container: 
-      image: quay.io/helmpack/chart-release
+      image: quay.io/helmpack/chart-releaser:latest
       env:
         CR_OWNER: "FociSolutions"
         CR_GIT_REPO: "helm-charts"
