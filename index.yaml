@@ -1,0 +1,19 @@
+apiVersion: v1
+entries:
+  servatrice:
+  - apiVersion: v2
+    appVersion: "2"
+    created: "2020-04-15T21:40:12.373019071Z"
+    dependencies:
+    - name: mysql
+      repository: https://kubernetes-charts.storage.googleapis.com
+      version: 1.6.2
+    description: deploys the cockatrice server called servatrice along with the MySql
+      database
+    digest: 02aa0966fb65c0f6a138f851ee3ec879e780bcd1c857bfba43cbbb543c19732a
+    name: servatrice
+    type: application
+    urls:
+    - https://github.com/FociSolutions/helm-charts/releases/download/servatrice-0.1.0/servatrice-0.1.0.tgz
+    version: 0.1.0
+generated: "2020-04-15T21:40:12.260342581Z"
