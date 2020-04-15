@@ -12,10 +12,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: docker://quay.io/helmpack/chart-releaser
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: helm package
         run: helm package ./charts/servatrice --destination .deploy
-        
-      - uses: docker://quay.io/helmpack/chart-releaser
       - name: chart releaser step
         env:
           CR_OWNER: "FociSolutions"
