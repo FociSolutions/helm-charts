@@ -58,7 +58,7 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: index
-          path: ./.index/index.yaml
+          path: ./.index
       - name: Publish generated content to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
